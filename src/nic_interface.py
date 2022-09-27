@@ -27,9 +27,14 @@ def nic_send(input_4bit_representation: str):
 Returns a stringified 4-bit value indicating the receiver states
 """
 def nic_recv():
-    reciever_4bit_representation = []
+    reciever_4bit_representation = [0,0,0,0]
     reciever_4bit_representation[0] = str(pi.read(26))
     reciever_4bit_representation[1] = str(pi.read(24))
     reciever_4bit_representation[2] = str(pi.read(22))
     reciever_4bit_representation[3] = str(pi.read(20))
-    "".join(reciever_4bit_representation) 
+    return "".join(reciever_4bit_representation) 
+
+# Set all ports to 0 then 1 then 0 to "clean them"
+nic_send("0000")
+nic_send("1111")
+nic_send("0000")
