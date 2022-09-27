@@ -2,9 +2,9 @@
 Reusable code for driving the physical layer.
 
 ## Authors
-- [Simay Cural](https://github.com/scural)
-- [James Settles](https://github.com/JamesSettles)
-- [Quattro Musser](https://github.com/RobertMusser)
+- [scural](https://github.com/scural)
+- [JamesSettles](https://github.com/JamesSettles)
+- [RobertMusser](https://github.com/RobertMusser)
 
 ### nic_interface.py
 Library for interfacing the Pi with the NIC using python. The repositories include a src file, a README.md, and a released_to.txt.
