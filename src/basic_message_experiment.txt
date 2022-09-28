@@ -1,0 +1,24 @@
+Simay
+Quattro 
+James
+
+Experiment: Sending basic bit messages
+This experiment tests how we can send basic bit messages unidirectionally.
+
+Motivation: 
+We need to establish an ability to send basic messages between devices before we can
+expand to sending more complex messages, potentially across multiple devices
+
+Experimental Setup: 
+Two pi's, two NIC's, port 1 xmit connected to port 1 recv using two wires
+A python library that initializes communocation, receives and sends a message.
+
+Expected Results:
+We expect that the sending pi (a) will send a startup code to the revceiving pi (b) 
+will read this code and begin listening. B will then send the "I'm listening" message
+to a. When a revceives this it will send the message, will b will read in and then 
+print to the command line. 
+
+Results:
+
+Note:

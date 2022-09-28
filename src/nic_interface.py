@@ -15,6 +15,14 @@ pi.set_mode(22,pigpio.INPUT)
 pi.set_mode(21,pigpio.OUTPUT)
 pi.set_mode(20,pigpio.INPUT)
 
+class Packet:
+  def __init__(bit_msg):
+    self.bit_msg = bit_msg
+    getbinary = lambda x, n: format(x, "b").zfill(n)
+    self.header = getbinary(len(self.bit_msg),3)
+    self.header = "1"+ self.header
+    self.bit_msg = self.bit_msg + "0" # Need to end with 0 so that the bit stream returns to 0
+
 """
 Takes in a stringified 4-bit representation of the ports to send to
 "0011" would send to ports 3 & 4
@@ -41,7 +49,7 @@ def nic_port_send(bit: str, port: int):
 """
 Returns a stringified 4-bit value indicating the receiver states
 """
-def nic_recv():
+def nic_recv() -> str:
     reciever_4bit_representation = [0,0,0,0]
     reciever_4bit_representation[0] = str(pi.read(26))
     reciever_4bit_representation[1] = str(pi.read(24))
@@ -52,23 +60,46 @@ def nic_recv():
 # ================== send receive functions ===================
 
 def initialize_communication(port):
+    print(f"initializing communication, sending on port {port}")
     nic_port_send("1", port)
     read_value = nic_recv() 
+    print("reading nic port values, wating for verification")
     while (read_value[int(port) - 1] != "1"):
         read_value = nic_recv() 
+        print("reading nic port values, wating for verification")
+    print("verification received")
     return True
 
 # send
 def send_message(port, message):
-    for bit in message:
-        nic_port_send(bit, port)
-        time.sleep(.001)
+    new_packet = Packet(message)
+    for bit in new_packet:
+        nic_port_send(new_packet, port)
 
 # receive 
 def receive_message(port):
+    msg = ""
+    msg_size = "" # Binary rep of msg size
+    is_decoding_header = False
+    is_decoding_msg = False
     while True:
-        print(nic_recv)
-        time.sleep(.001)
+        received_msg = nic_recv()[port -1]
+        
+        if(is_decoding_header and len(msg_size) < 3):
+            msg_size += received_msg
+        
+        if(msg_size == 3 and ):
+            # Now we decode msg
+            msg += received_msg
+
+
+        if(received_msg[port - 1] == "1"):
+                is_decoding_header = True
+        
+
+        
+
+
 
 # Set all ports to 0 then 1 then 0 to "clean them"
 nic_send("0000")
