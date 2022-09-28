@@ -23,6 +23,20 @@ def nic_send(input_4bit_representation: str):
     pi.write(25, int(input_4bit_representation[1]))
     pi.write(23, int(input_4bit_representation[2]))
     pi.write(21, int(input_4bit_representation[3]))
+
+"""
+Writes a bit to a specific port
+"""
+def nic_port_send(bit: str, port: int):
+    if port == 1:
+        pi.write(27, int(bit))
+    if port == 2:
+        pi.write(25, int(bit))
+    if port == 3:
+        pi.write(23, int(bit))
+    else:
+        pi.write(21, int(bit))
+
 """
 Returns a stringified 4-bit value indicating the receiver states
 """
@@ -33,3 +47,4 @@ def nic_recv():
     reciever_4bit_representation[2] = str(pi.read(22))
     reciever_4bit_representation[3] = str(pi.read(20))
     "".join(reciever_4bit_representation) 
+
