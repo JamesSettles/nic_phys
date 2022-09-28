@@ -1,4 +1,5 @@
 import pigpio
+import time
 
 pi = pigpio.pi()   
 # Port 1
@@ -47,6 +48,27 @@ def nic_recv():
     reciever_4bit_representation[2] = str(pi.read(22))
     reciever_4bit_representation[3] = str(pi.read(20))
     return "".join(reciever_4bit_representation) 
+
+# ================== send receive functions ===================
+
+def initialize_communication(port):
+    nic_port_send("1", port)
+    read_value = nic_recv() 
+    while (read_value[int(port) - 1] != "1"):
+        read_value = nic_recv() 
+    return True
+
+# send
+def send_message(port, message):
+    for bit in message:
+        nic_port_send(bit, port)
+        time.sleep(.001)
+
+# receive 
+def receive_message(port):
+    while True:
+        print(nic_recv)
+        time.sleep(.001)
 
 # Set all ports to 0 then 1 then 0 to "clean them"
 nic_send("0000")
