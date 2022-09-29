@@ -16,13 +16,13 @@ pi.set_mode(21,pigpio.OUTPUT)
 pi.set_mode(20,pigpio.INPUT)
 
 class Packet:
-    def __init__(self, msg: str):
-        self.bit_msg = format(int(msg), "b")
-        getbinary = lambda x, n: format(x, "b").zfill(n)
-        self.header = getbinary(len(self.bit_msg), 4)
-        self.header = "1"+ self.header
-        self.bit_msg = self.bit_msg + "0" # Need to end with 0 so that the bit stream returns to 0
-        self.total_msg = self.header + self.bit_msg
+  def __init__(self, bit_msg):
+    self.bit_msg = bit_msg
+    getbinary = lambda x, n: format(x, "b").zfill(n)
+    self.header = getbinary(len(self.bit_msg), 3)
+    self.header = "1"+ self.header
+    self.bit_msg = self.bit_msg + "0" # Need to end with 0 so that the bit stream returns to 0
+    self.total_msg = self.header + self.bit_msg
 
 """
 Takes in a stringified 4-bit representation of the ports to send to
@@ -83,7 +83,7 @@ def send_message(port: str, message: str):
 # receive 
 def receive_message(port):
     msg = ""
-    msg_size = "" # Binary rep of msg size
+    msg_size = ""# Binary rep of msg size
     is_decoding_header = False
     is_decoding_msg = False
     while True:
@@ -98,17 +98,17 @@ def receive_message(port):
             continue
 
         # decoding header
-        if(is_decoding_header and len(msg_size) < 4):
+        if(is_decoding_header and len(msg_size) < 3):
             msg_size += received_msg
             # print("adding to msg_size header")
         
         # add to the msg if the msg hasn't reached its max length
-        if(len(msg_size) == 4 and len(msg) != int(msg_size, 2)):
+        if(msg_size == 3 and len(msg) != int(msg_size,2)):
             # Now we decode msg
             is_decoding_msg = True
             msg += received_msg
-        elif (msg_size != "" and len(msg) == int(msg_size, 2)): # print when msg is done
-            print(int(msg, 2))
+        elif(msg_size != "" and len(msg) == int(msg_size,2)): # print when msg is done
+            print(msg)
             break
 
 # zeros out the ports

@@ -24,5 +24,6 @@ Currently we aren't receiving our expected results. We have gotten the capabilit
 a msg is ready to be sent the "hi" from both sides is received and we have created packets to send messages
 but it doesn't seem like the msg is being decoded correctly. I suspect this has something to do with clock sync,
 tomorrow will look into that more
-
 Results:
+
+Note:

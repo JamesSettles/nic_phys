@@ -1,5 +1,6 @@
 import nic_interface as nic
 
+nic.flush()
 nic.initialize_communication(1)
 
 input_val = input("are you receiving (r) or sending (s) ")
