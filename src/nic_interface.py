@@ -16,12 +16,13 @@ pi.set_mode(21,pigpio.OUTPUT)
 pi.set_mode(20,pigpio.INPUT)
 
 class Packet:
-  def __init__(bit_msg):
+  def __init__(self, bit_msg):
     self.bit_msg = bit_msg
     getbinary = lambda x, n: format(x, "b").zfill(n)
     self.header = getbinary(len(self.bit_msg),3)
     self.header = "1"+ self.header
     self.bit_msg = self.bit_msg + "0" # Need to end with 0 so that the bit stream returns to 0
+    self.total_msg = self.header + self.bit_msg
 
 """
 Takes in a stringified 4-bit representation of the ports to send to
@@ -68,33 +69,47 @@ def initialize_communication(port):
         read_value = nic_recv() 
         print("reading nic port values, wating for verification")
     print("verification received")
+    nic_port_send("0",port)
     return True
 
 # send
-def send_message(port, message):
+def send_message(port: str, message: str):
     new_packet = Packet(message)
-    for bit in new_packet:
-        nic_port_send(new_packet, port)
+    for bit in new_packet.total_msg:
+        nic_port_send(bit, port)
 
 # receive 
 def receive_message(port):
     msg = ""
-    msg_size = "" # Binary rep of msg size
+    msg_size = ""# Binary rep of msg size
     is_decoding_header = False
     is_decoding_msg = False
     while True:
-        received_msg = nic_recv()[port -1]
-        
-        if(is_decoding_header and len(msg_size) < 3):
+        received_msg = nic_recv()[port - 1]
+         # check for start of msg
+        if(received_msg == "1" and not is_decoding_msg):
+            if(not is_decoding_header):
+                print("Now decoding header")
+            print(received_msg)
+            is_decoding_header = True
+            continue
+
+        # decoding header
+        if(is_decoding_header and len(msg_size) < 4):
             msg_size += received_msg
+            print("adding to msg_size header")
         
-        if(msg_size == 3 and ):
+        # add to the msg if the msg hasn't reached its max length
+        if(msg_size == 3 and len(msg) != int(msg_size,2)):
             # Now we decode msg
+            is_decoding_msg = True
             msg += received_msg
+        elif(msg_size != "" and len(msg) == int(msg_size,2)): # print when msg is done
+            print(msg)
+            break
+        
+       
 
-
-        if(received_msg[port - 1] == "1"):
-                is_decoding_header = True
         
 
         

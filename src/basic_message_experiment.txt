@@ -19,6 +19,11 @@ will read this code and begin listening. B will then send the "I'm listening" me
 to a. When a revceives this it will send the message, will b will read in and then 
 print to the command line. 
 
+Update 9/28:
+Currently we aren't receiving our expected results. We have gotten the capability of ensuring
+a msg is ready to be sent the "hi" from both sides is received and we have created packets to send messages
+but it doesn't seem like the msg is being decoded correctly. I suspect this has something to do with clock sync,
+tomorrow will look into that more
 Results:
 
 Note:
