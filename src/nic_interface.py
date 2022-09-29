@@ -77,6 +77,7 @@ def send_message(port: str, message: str):
     new_packet = Packet(message)
     for bit in new_packet.total_msg:
         nic_port_send(bit, port)
+        time.sleep(1)
 
 # receive 
 def receive_message(port):
@@ -85,6 +86,8 @@ def receive_message(port):
     is_decoding_header = False
     is_decoding_msg = False
     while True:
+        if(is_decoding_header):
+            time.sleep(1)
         received_msg = nic_recv()[port - 1]
          # check for start of msg
         if(received_msg == "1" and not is_decoding_msg):
