@@ -7,4 +7,4 @@ while(1==1):
         split_val = val.split(" ")
         nic_interface.nic_send(split_val[-1])
     elif val == "r" or val == "receive":
-       print(nic_interface.nic_recv())      
+       print(nic_interface.nic_recv_all_ports())      

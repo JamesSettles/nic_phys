@@ -1,6 +1,8 @@
 import pigpio
 import time
 
+from nic_interface import nic_recv_from_port
+
 pi = pigpio.pi()   
 # Port 1
 pi.set_mode(27,pigpio.OUTPUT)
@@ -89,7 +91,7 @@ def receive_message(port):
     while True:
         if(is_decoding_header):
             time.sleep(0.1)
-        received_msg = nic_recv()[port - 1]
+        received_msg = nic_recv_from_port(port)
         # check for start of msg
         if(received_msg == "1" and not is_decoding_msg and not is_decoding_header):
             # print("Now decoding header")

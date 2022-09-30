@@ -15,14 +15,6 @@ pi.set_mode(22,pigpio.INPUT)
 pi.set_mode(21,pigpio.OUTPUT)
 pi.set_mode(20,pigpio.INPUT)
 
-class Packet:
-    def __init__(self, msg: str):
-        self.bit_msg = format(int(msg), "b")
-        getbinary = lambda x, n: format(x, "b").zfill(n)
-        self.header = getbinary(len(self.bit_msg), 4)
-        self.header = "1"+ self.header
-        self.bit_msg = self.bit_msg + "0" # Need to end with 0 so that the bit stream returns to 0
-        self.total_msg = self.header + self.bit_msg
 
 """
 Takes in a stringified 4-bit representation of the ports to send to
@@ -50,40 +42,88 @@ def nic_port_send(bit: str, port: int):
 """
 Returns a stringified 4-bit value indicating the receiver states
 """
-def nic_recv() -> str:
+def nic_recv_all_ports() -> str:
     reciever_4bit_representation = [0,0,0,0]
     reciever_4bit_representation[0] = str(pi.read(26))
     reciever_4bit_representation[1] = str(pi.read(24))
     reciever_4bit_representation[2] = str(pi.read(22))
     reciever_4bit_representation[3] = str(pi.read(20))
     return "".join(reciever_4bit_representation) 
+"""
+Reads bits at given port
+"""
+def nic_recv_from_port(port) -> str:
+    return nic_recv_all_ports()[port-1]
 
 # ================== send receive functions ===================
 
 def initialize_communication(port):
     print(f"initializing communication, sending on port {port}")
-    nic_port_send("1", port)
-    read_value = nic_recv() 
+    nic_port_send("0", port)
+    read_value = nic_recv_from_port(port) 
     print("reading nic port values, wating for verification")
-    while (read_value[int(port) - 1] != "1"):
-        read_value = nic_recv() 
+    while (read_value != "0"):
+        read_value = nic_recv_from_port(port) 
         print("reading nic port values, wating for verification")
     print("verification received")
-    time.sleep(1)
-    nic_port_send("0",port)
     return True
 
+class Packet:
+  def __init__(self, msg):
+    self.bit_msg = format(int(msg), "b")
+    getbinary = lambda x, n: format(x, "b").zfill(n)
+    self.header = getbinary(len(self.bit_msg), 4)
+    self.header = "1" + self.header
+    self.bit_msg = self.bit_msg + "0"
+    self.total_msg = self.header + self.bit_msg
+
 # send
-def send_message(port: str, message: str):
+def send_message(port: str, message: str, sleep_time: int):
     new_packet = Packet(message)
+    print(new_packet.total_msg)
     for bit in new_packet.total_msg:
         nic_port_send(bit, port)
-        time.sleep(0.1)
+        time.sleep(sleep_time)
 
+# reads in a continous bit stream
+def read_bit_stream(port:int ,sleep_time:int):
+    bits_in_message = []
+    # TODO need to refactor header functionality so we don't have to read max msg length at a time
+    max_number_message_bits = 12
+    for i in range(max_number_message_bits):
+        time.sleep(sleep_time)
+        bits_in_message.append(nic_recv_from_port(port))
+    return bits_in_message
+
+def receive_message(port):
+    is_waiting_for_msg_start = True 
+    while is_waiting_for_msg_start:
+        if nic_recv_from_port(port) == "1":
+            # starts reading in whole msg
+            bits_in_msg = read_bit_stream(port,0.5)
+            is_waiting_for_msg_start = False
+    # begin processing msg
+    header_bits = "" # will be a str of the binary rep of message length
+    # read bits from header
+    for header_bit in bits_in_msg[:4]:
+        header_bits += header_bit
+        bits_in_msg.remove(header_bit)
+    header_bits = int(header_bits, 2)
+    # reading from msg bits
+    msg = ""
+    for msg_bit in bits_in_msg[:header_bits]:
+        msg += msg_bit
+    print(int(msg, 2))
+
+# zeros out the ports
+def flush():
+    nic_send("1111")
+
+"""
 # receive 
 def receive_message(port):
     msg = ""
-    msg_size = "" # Binary rep of msg size
+    msg_size = ""# Binary rep of msg size
     is_decoding_header = False
     is_decoding_msg = False
     while True:
@@ -98,20 +138,18 @@ def receive_message(port):
             continue
 
         # decoding header
-        if(is_decoding_header and len(msg_size) < 4):
+        if(is_decoding_header and len(msg_size) < 3):
             msg_size += received_msg
             # print("adding to msg_size header")
         
         # add to the msg if the msg hasn't reached its max length
-        if(len(msg_size) == 4 and len(msg) != int(msg_size, 2)):
+        if(msg_size == 3 and len(msg) != int(msg_size,2)):
             # Now we decode msg
             is_decoding_msg = True
             msg += received_msg
-        elif (msg_size != "" and len(msg) == int(msg_size, 2)): # print when msg is done
-            print(int(msg, 2))
+        elif(msg_size != "" and len(msg) == int(msg_size,2)): # print when msg is done
+            print(msg)
             break
 
-# zeros out the ports
-def flush():
-    nic_send("0000")
+"""
 
