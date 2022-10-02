@@ -31,3 +31,5 @@ def bin_to_str(bin_reps) -> str:
     for bin_rep in bin_reps:
         str_rep += bin_to_char(bin_rep)
     return str_rep
+
+print(bin_to_str(str_to_binary("here it is")))

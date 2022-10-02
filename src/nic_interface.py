@@ -1,6 +1,6 @@
 import pigpio
 import time
-
+import text_to_binary as t2bin
 pi = pigpio.pi()   
 # Port 1
 pi.set_mode(27,pigpio.OUTPUT)
@@ -69,19 +69,27 @@ def initialize_communication(port):
     return True
 
 class Packet:
-  def __init__(self, msg):
-    self.bit_msg = format(int(msg), "b")
-    getbinary = lambda x, n: format(x, "b").zfill(n)
-    self.header = getbinary(len(self.bit_msg), 4)
-    self.header = "1" + self.header
-    self.bit_msg = self.bit_msg + "0"
-    self.total_msg = self.header + self.bit_msg
+    """
+    msg is any stringified binary, any conversions from text string -> binary
+    or int -> binary should be done outside this class
+    """
+    def __init__(self, msg):
+        self.bit_msg = msg 
+        getbinary = lambda x, n: format(x, "b").zfill(n)
+        self.header = getbinary(len(self.bit_msg), 4)
+        self.header = "1" + self.header
+        self.bit_msg = self.bit_msg + "0"
+        self.total_msg = self.header + self.bit_msg
 
 # send
 def send_message(port: str, message: str, sleep_time: int):
-    new_packet = Packet(message)
-    print(new_packet.total_msg)
-    for bit in new_packet.total_msg:
+    if message == None:
+        bit_sequence = "10000" # null char has a size of 0
+    else:
+        new_packet = Packet(message)
+        bit_sequence = new_packet.total_msg
+        #print(bit_sequence)
+    for bit in bit_sequence:
         nic_port_send(bit, port)
         time.sleep(sleep_time)
 
@@ -102,54 +110,21 @@ def receive_message(port, sleep_time):
             bits_in_msg = read_bit_stream(port, sleep_time)
             is_waiting_for_msg_start = False
     # begin processing msg
-    print(bits_in_msg)
+    #print(bits_in_msg)
     header_bits = "" # will be a str of the binary rep of message length
     # read bits from header
     for header_bit in bits_in_msg[:4]:
         header_bits += header_bit
         bits_in_msg.remove(header_bit)
     header_bits = int(header_bits, 2)
+    if header_bits == 0:
+        return None
     # reading from msg bits
     msg = ""
     for msg_bit in bits_in_msg[:header_bits]:
         msg += msg_bit
-    print(int(msg, 2))
+    return t2bin.bin_to_char(msg)
 
 # zeros out the ports
 def flush():
     nic_send("1111")
-
-"""
-# receive 
-def receive_message(port):
-    msg = ""
-    msg_size = ""# Binary rep of msg size
-    is_decoding_header = False
-    is_decoding_msg = False
-    while True:
-        if(is_decoding_header):
-            time.sleep(0.1)
-        received_msg = nic_recv()[port - 1]
-        # check for start of msg
-        if(received_msg == "1" and not is_decoding_msg and not is_decoding_header):
-            # print("Now decoding header")
-            # print(received_msg)
-            is_decoding_header = True
-            continue
-
-        # decoding header
-        if(is_decoding_header and len(msg_size) < 3):
-            msg_size += received_msg
-            # print("adding to msg_size header")
-        
-        # add to the msg if the msg hasn't reached its max length
-        if(msg_size == 3 and len(msg) != int(msg_size,2)):
-            # Now we decode msg
-            is_decoding_msg = True
-            msg += received_msg
-        elif(msg_size != "" and len(msg) == int(msg_size,2)): # print when msg is done
-            print(msg)
-            break
-
-"""
-
