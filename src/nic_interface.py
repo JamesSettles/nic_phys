@@ -85,24 +85,24 @@ def send_message(port: str, message: str, sleep_time: int):
         nic_port_send(bit, port)
         time.sleep(sleep_time)
 
-# reads in a continous bit stream
-def read_bit_stream(port:int ,sleep_time:int):
-    bits_in_message = []
-    # TODO need to refactor header functionality so we don't have to read max msg length at a time
-    max_number_message_bits = 12
-    for i in range(max_number_message_bits):
+# reads in 12 bits
+def read_bit_stream(port:int, sleep_time:int):
+    time.sleep(sleep_time * 1.5)     # to get in the middle of first significant bit
+    msg = [nic_recv_from_port(port)]
+    for i in range(11):              # read 1 bit, max of 12 total, so read next 11
         time.sleep(sleep_time)
-        bits_in_message.append(nic_recv_from_port(port))
-    return bits_in_message
+        msg.append(nic_recv_from_port(port))
+    return msg
 
-def receive_message(port):
+def receive_message(port, sleep_time):
     is_waiting_for_msg_start = True 
     while is_waiting_for_msg_start:
         if nic_recv_from_port(port) == "1":
             # starts reading in whole msg
-            bits_in_msg = read_bit_stream(port,0.5)
+            bits_in_msg = read_bit_stream(port, sleep_time)
             is_waiting_for_msg_start = False
     # begin processing msg
+    print(bits_in_msg)
     header_bits = "" # will be a str of the binary rep of message length
     # read bits from header
     for header_bit in bits_in_msg[:4]:
