@@ -1,0 +1,36 @@
+Simay
+Quattro 
+James
+
+Experiment: Sending text messages
+This experiment tests how we can send basic text messages bidirectionally.
+
+Motivation: 
+We need to establish an ability to send basic messages between devices before we can
+expand to sending more complex messages across a network of devices.
+
+Experimental Setup: 
+We use two pi's both executing identical code. Port 1 of each pi is connected to port 
+1 of the other. Because of the random voltage found on ports on startup, running flush.py 
+(which sets all voltages to high) is sometimes nessisary. Next, we run part2.py on both
+pis. 
+
+Expected Results:
+part2.py should send a wake up call (low voltage) to the other pi. When this wake up
+call is reciprocated, both pi's should enter text chat mode. In this mode both pis can 
+send and receive text at any time.
+
+Results:
+This was very hard to implement. Agreeing on a temporal bit width is difficult as the 
+smallest acceptable bit width changes pi to pi. Another bug we were stuck on for a while
+came from our method of sending and reading at more or less at the same time, waiting the 
+agreed apon bit width, and then sending/reading again. This resulted in unpredictable 
+misreadings of sent messages. These misreadings did not decrease as we increased bit width, 
+which was very confusing to us. Eventually we figured out it was caused not by bit width, 
+but by propagation delay, and we started reading .5 the agreed upon bit width after sending 
+the message. We are able to get a basic form of text chat working, using a library that 
+converts binary into askii representations of text, however we still have some bugs. 
+
+For some reason spaces are difficult to send. Any space followed by some letter will crash 
+our program. Our hope is to get this bug figured out soon, and be able to send arbirary
+text.
