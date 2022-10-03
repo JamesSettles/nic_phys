@@ -25,6 +25,7 @@ def listen_for_write_msgs():
         bin_reps.append(None)
         for bin_rep in bin_reps:
             tc.send_message(1, bin_rep, BIT_WIDTH)
+            time.sleep(0.01)
 
 
 read_thread = threading.Thread(target=listen_for_read_msgs,args=())

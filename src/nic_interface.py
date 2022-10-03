@@ -15,7 +15,6 @@ pi.set_mode(22,pigpio.INPUT)
 pi.set_mode(21,pigpio.OUTPUT)
 pi.set_mode(20,pigpio.INPUT)
 
-
 """
 Takes in a stringified 4-bit representation of the ports to send to
 "0011" would send to ports 3 & 4
