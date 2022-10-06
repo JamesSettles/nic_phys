@@ -13,9 +13,8 @@ message structure, hopefully we will eliminate this problem.
 
 Experimental Setup / Expected Results:
 We started by changing the whole structure of the metadata of sent/received messages. Each message begins with a “1” to indicate the start of a message 
-and “0” to indicate the end. Following the initial “1” is the 3 bit data that contains which port the message came from. After the port data, there is a parity bit that makes sure that the messages are sent to the correct port. The rest of the message metadata is the structure that we were previously using, containing the binary representation of a character and an ending sequence. Hopefully by adding where the data comes from and a parity bit that will error check we won’t have any problems with echos.
+and “0” to indicate the end. Following the initial “1” is the 3 bit data that contains which port the message came from. After the port data, there is a parity bit that to check if there was an error in sending the port bit message. The rest of the message metadata is the structure that we were previously using, containing the binary representation of a character and an ending sequence. Hopefully by adding where the data comes from and a parity bit that will error check we won’t have any problems with echos.
 
 Results:
-We are able to send messages to the correct ports and the parity bits seem to be keeping bit flips in check. The downside of this experiment is that
-we had to use a bigger bit width compared to our previous experiments. As we work more on this project, hopefully we’ll find a way to get the bit width down.
+We are able to send messages to the correct ports and the parity bits seem to be keeping bit flips in check. However our parity bit can only check for one error. If there are more than one errors, something which can occur, the message will still be incorrectly read.
 
