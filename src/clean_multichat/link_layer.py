@@ -88,3 +88,4 @@ def read_in_packet(port:int, bit_width:int):
     if port == int(port_header[:-1], 2):
         bit_msg = read_in_bit_msg(port, bit_width)
         return bit_msg if bit_msg else None
+    return -1
