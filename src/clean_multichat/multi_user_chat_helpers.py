@@ -25,9 +25,8 @@ def continously_read_msgs(port,bit_width):
         bit_msg = link.receive_bit_message(port,bit_width)
         if bit_msg == -1:
             continue
-        decoded_char = t2bin.bin_to_char(bit_msg)
         if (bit_msg != None):
-            msg_to_print += decoded_char
+            msg_to_print += t2bin.bin_to_char(bit_msg)
         else:
             print("\n" + msg_to_print)
             msg_to_print = ""

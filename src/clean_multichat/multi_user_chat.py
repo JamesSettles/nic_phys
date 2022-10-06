@@ -22,8 +22,8 @@ if port2:
 while True:
     if port2:
         msg_to_send = input(f"{usr_name}: ")
-        helpers.send_msg_out_on_two_ports(port1,port2,msg_to_send,BIT_WIDTH) # Uses one thread to send
+        helpers.send_msg_out_on_two_ports(port1,port2,usr_name + msg_to_send,BIT_WIDTH) # Uses one thread to send
     else:
         msg_to_send = input(f"{usr_name}: ")
-        helpers.send_msg_out_on_port(port1,msg_to_send,BIT_WIDTH)
+        helpers.send_msg_out_on_port(port1,usr_name + msg_to_send,BIT_WIDTH)
         
