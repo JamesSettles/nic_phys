@@ -1,0 +1,28 @@
+Simay
+Quattro 
+James
+
+Experiment: Setting up routing tables in network simulator
+This experiment sets up a basic routing table for a network layer and tries to find the shortest path for each neighbor.
+
+Motivation: 
+To be able to send or receive messages by using a routing table to pull up specific information on which path to take to get to destination most 
+efficiently.
+
+Experimental Setup: 
+We use the provided network simulator to test out the routing protocol. The nodes in the simulator represent the ports that would normally be used 
+in a physical set up. The edges represent the wires that would’ve been used. 
+
+Expected Results:
+Once a node is made, the routing table should be created at the same time. The routing table should traverse the initial node's neighbors and take 
+in their names, addresses, which edge it's connected to and the number of hops it takes to get to that address. As the table gets filled in, it should 
+add in the shortest possible path to take as the edge link. This feature of the table should update if there is any additional wiring or any cut offs. 
+Once one routing table is done, the table of contents should be compared with other tables to get additional addresses that could be seen as the neighbors 
+neighbor.
+
+Results:
+The general setting up of the routing tables were generally inspired from data structures and algorithms. Once the node adds itself to the table it 
+traverses through the neighbors. However, traversing through all neighbors can consume a lot of time and power if applied to a big network. Not to 
+mention, when the system is looking for the shortest possible path to add to the table it goes through all of the network just to fill up one column. 
+Right now what we need to work on is to have the tables automatically update and work on efficiency. One idea that we could implement in the future to 
+get the shortest path without traversing is that we could send signals through the wires and use clocktime to estimate which path would be most optimal. 
